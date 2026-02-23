@@ -1,0 +1,29 @@
+---
+description: Rules for callback functions passed to array methods and other higher-order functions
+globs: "**/*.{js,vue}"
+alwaysApply: false
+---
+
+# Callback Functions
+
+Always extract callback functions passed to array methods (`.forEach`, `.map`, `.filter`, `.find`, `.reduce`, `.some`, `.every`, etc.) into a named `const` before passing them.
+
+```javascript
+// BAD — anonymous inline callback
+this.IBANForm.forEach((field) => {
+  field.value = '';
+});
+
+const field = this.IBANForm.find((f) => f.name === fieldName);
+
+// GOOD — named const callback
+const resetValue = (field) => {
+  field.value = '';
+};
+this.IBANForm.forEach(resetValue);
+
+const isMatchingField = (f) => f.name === fieldName;
+const field = this.IBANForm.find(isMatchingField);
+```
+
+This applies to all higher-order function calls, not just array methods — e.g. `setTimeout`, `$watch`, `Promise.then`, etc.

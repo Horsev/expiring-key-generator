@@ -1,0 +1,10 @@
+---
+description: Keep git commit messages short and concise
+alwaysApply: true
+---
+
+# Commit Messages
+
+- Keep the commit message to a single line, max 140 characters.
+- Focus on **why** the change was made, not what was changed.
+- Do not add a commit body or multi-line description unless explicitly asked.
