@@ -1,6 +1,10 @@
 # expiring-key-generator
 
-Generate date-based keys and validate them within a time window. Uses a secret alphabet for base-N encoding + SHA256 hashing. Zero dependencies (besides Node's `crypto`).
+Generate date-based keys and validate them within a time window. Uses a secret alphabet for base-N encoding + SHA256 hashing.
+
+- Zero dependencies (besides Node's `crypto`)
+- Algorithmic generation
+- No Database needed
 
 ## Install
 

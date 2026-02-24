@@ -1,8 +1,10 @@
 import { createHash } from "node:crypto";
 
-const toISODate = (date) => date.toISOString().split("T")[0];
+const pad = (n) => String(n).padStart(2, "0");
+const toLocalDate = (date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 const stripDashes = (str) => str.replace(/-/g, "");
-const toDigits = (date) => stripDashes(toISODate(date));
+const toDigits = (date) => stripDashes(toLocalDate(date));
 const sha256Base64 = (str) =>
   createHash("sha256").update(str).digest("base64");
 
@@ -15,11 +17,13 @@ const subtractDays = (date, days) =>
 const generateDateRange = (endDate, days) =>
   Array.from({ length: days + 1 }, (_, i) => subtractDays(endDate, i));
 
-const createKeyValidator = (codec) => (hash, currentDate, days) => {
+const createKeyValidator = (codec) => {
   const generateKey = createPublicKeyGenerator(codec);
-  const dateRange = generateDateRange(currentDate, days);
-  const isMatch = (date) => generateKey(date) === hash;
-  return dateRange.some(isMatch);
+  return (hash, currentDate, days) => {
+    const dateRange = generateDateRange(currentDate, days);
+    const isMatch = (date) => generateKey(date) === hash;
+    return dateRange.some(isMatch);
+  };
 };
 
 export { createPublicKeyGenerator, createKeyValidator };

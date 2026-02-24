@@ -67,21 +67,14 @@ const convertPublicHashToSecretId = (secretKey) => {
 const getHashByCode = convertSecretIdToPublicHash(SECRET_KEY);
 const getCodeByHash = convertPublicHashToSecretId(SECRET_KEY);
 
-// const ipnCode = "2835714815"; // With checksum 2835714815
-const ipnCode = "288261825"; // With checksum 2882618253
-
 const hashIPN = getHashByCode(ipnCode);
 const decodedHash = getCodeByHash(hashIPN);
 
-console.log(hashIPN, decodedHash);
-
-const usCarPlateStyle = hashIPN.replace(RE_HASH_IPN, "$1-$2");
-
-console.log(usCarPlateStyle);
-
+// Example usage
 const newDate = new Date().toISOString().split("T")[0];
-const normalizedNewDate = newDate.replace(/-/g, "");
-const hashDate = getHashByCode(normalizedNewDate);
-const decodedHashDate = getCodeByHash(hashDate);
+const input = newDate.replace(/-/g, "");
 
-console.log(newDate, normalizedNewDate, hashDate, decodedHashDate);
+const hash = getHashByCode(input);
+const decoded = getCodeByHash(hash);
+
+console.log(input, hash, decoded);

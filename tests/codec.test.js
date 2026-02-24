@@ -9,7 +9,7 @@ describe("encode / decode", () => {
   const decodeWith = decode(SECRET_KEY);
 
   describe("round-trip", () => {
-    const cases = ["1", "42", "20260223", "288261825", "99999999"];
+    const cases = ["0", "1", "42", "20260223", "288261825", "99999999"];
 
     const assertRoundTrip = (input) => {
       const hash = encodeWith(input);
@@ -43,6 +43,20 @@ describe("encode / decode", () => {
   describe("decode", () => {
     it("throws on invalid characters", () => {
       expect(() => decodeWith("!!!")).toThrow('Invalid char: "!"');
+    });
+  });
+
+  describe("encode validation", () => {
+    it("throws on non-numeric input", () => {
+      expect(() => encodeWith("abc")).toThrow('Invalid input: "abc"');
+    });
+
+    it("throws on negative input", () => {
+      expect(() => encodeWith("-1")).toThrow('Invalid input: "-1"');
+    });
+
+    it("throws on float input", () => {
+      expect(() => encodeWith("3.14")).toThrow('Invalid input: "3.14"');
     });
   });
 

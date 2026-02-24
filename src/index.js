@@ -1,20 +1,16 @@
 import { encode } from "./encode.js";
-import { decode } from "./decode.js";
 import { generateSecretKey } from "./generateKey.js";
 import {
   createPublicKeyGenerator,
   createKeyValidator as _createKeyValidator,
 } from "./publicKey.js";
 
-const createCodec = (secretKey) => ({
-  encode: encode(secretKey),
-  decode: decode(secretKey),
-});
+const toCodec = (secretKey) => ({ encode: encode(secretKey) });
 
 const createKeyGenerator = (secretKey) =>
-  createPublicKeyGenerator(createCodec(secretKey));
+  createPublicKeyGenerator(toCodec(secretKey));
 
 const createKeyValidator = (secretKey) =>
-  _createKeyValidator(createCodec(secretKey));
+  _createKeyValidator(toCodec(secretKey));
 
 export { generateSecretKey, createKeyGenerator, createKeyValidator };
