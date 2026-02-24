@@ -59,6 +59,10 @@ const isKeyValid = createKeyValidator(secretKey);
 isKeyValid(key, new Date("2026-02-23"), 28); // true if key was created within last 28 days
 ```
 
+## Demo
+
+See the [terminal demo](https://github.com/Horsev/expiring-key-generator-demo) for a working example with sample output.
+
 ## License
 
 MIT
