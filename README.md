@@ -59,6 +59,29 @@ const isKeyValid = createKeyValidator(secretKey);
 isKeyValid(key, new Date("2026-02-23"), 28); // true if key was created within last 28 days
 ```
 
+## Changelog
+
+### 1.1.2
+
+- Fix `crypto.randomInt` range error on Node 21+ (`max` exceeded `2^48 - 1`) thx [Mike Podgorniy](https://www.npmjs.com/~mike_podgorniy)
+
+### 1.1.1
+
+- Add demo link to README
+
+### 1.1.0
+
+- Use `crypto.randomInt` instead of `Math.random` for cryptographically secure key generation
+- Fix timezone bug — date encoding now uses local date instead of UTC
+- Add input validation to encoder (rejects non-integer and negative values, handles `"0"`)
+- Hoist key generator in validator closure for better performance
+- Remove unused `decode` import from public API barrel
+- Add `engines` field (`node >= 16`)
+
+### 1.0.0
+
+- Initial release — `generateSecretKey`, `createKeyGenerator`, `createKeyValidator`
+
 ## Demo
 
 See the [terminal demo](https://github.com/Horsev/expiring-key-generator-demo) for a working example with sample output.
