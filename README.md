@@ -65,6 +65,11 @@ isKeyValid(key, new Date("2026-02-23"), 28); // true if key was created within l
 
 ## Changelog
 
+### 1.3.0
+
+- Memoize validator hash range — repeated calls with the same date window use a cached `Set` lookup instead of recomputing SHA256 hashes
+- Cache key uses local date, so any `new Date()` on the same calendar day hits the cache
+
 ### 1.2.0
 
 - Validate secret key on `createKeyGenerator` / `createKeyValidator` — must be a 34-char permutation of the safe alphabet

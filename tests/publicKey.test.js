@@ -75,6 +75,22 @@ describe("createKeyValidator", () => {
     );
     expect(isKeyValid(otherKey, new Date("2026-02-23"), 28)).toBe(false);
   });
+
+  it("returns correct results on repeated calls with same window (memoized)", () => {
+    const today = new Date("2026-02-23");
+    const validKey = generateKey(new Date("2026-02-10"));
+    const expiredKey = generateKey(new Date("2026-01-01"));
+
+    expect(isKeyValid(validKey, today, 28)).toBe(true);
+    expect(isKeyValid(expiredKey, today, 28)).toBe(false);
+    expect(isKeyValid(validKey, today, 28)).toBe(true);
+  });
+
+  it("cache invalidates when window changes", () => {
+    const key = generateKey(new Date("2026-02-01"));
+    expect(isKeyValid(key, new Date("2026-02-23"), 28)).toBe(true);
+    expect(isKeyValid(key, new Date("2026-02-23"), 5)).toBe(false);
+  });
 });
 
 describe("secret key validation", () => {

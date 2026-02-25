@@ -19,10 +19,15 @@ const generateDateRange = (endDate, days) =>
 
 const createKeyValidator = (codec) => {
   const generateKey = createPublicKeyGenerator(codec);
+  let cached = { key: null, hashes: null };
+
   return (hash, currentDate, days) => {
-    const dateRange = generateDateRange(currentDate, days);
-    const isMatch = (date) => generateKey(date) === hash;
-    return dateRange.some(isMatch);
+    const cacheKey = `${toLocalDate(currentDate)}:${days}`;
+    if (cached.key !== cacheKey) {
+      const dateRange = generateDateRange(currentDate, days);
+      cached = { key: cacheKey, hashes: new Set(dateRange.map(generateKey)) };
+    }
+    return cached.hashes.has(hash);
   };
 };
 
