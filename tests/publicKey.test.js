@@ -5,6 +5,7 @@ import {
 } from "../src/index.js";
 
 const SECRET_KEY = "GYJDTP8WL6EQZ1AMN2UXFB379I4KCV5RSH";
+const INVALID_KEY_MSG = "Invalid secret key";
 
 describe("createKeyGenerator", () => {
   const generateKey = createKeyGenerator(SECRET_KEY);
@@ -73,5 +74,37 @@ describe("createKeyValidator", () => {
       new Date("2026-02-23"),
     );
     expect(isKeyValid(otherKey, new Date("2026-02-23"), 28)).toBe(false);
+  });
+});
+
+describe("secret key validation", () => {
+  it("rejects key with wrong length", () => {
+    expect(() => createKeyGenerator("ABC")).toThrow(INVALID_KEY_MSG);
+  });
+
+  it("rejects key containing O", () => {
+    expect(() =>
+      createKeyGenerator("OYJDTP8WL6EQZ1AMN2UXFB379I4KCV5RSH"),
+    ).toThrow(INVALID_KEY_MSG);
+  });
+
+  it("rejects key containing 0", () => {
+    expect(() =>
+      createKeyGenerator("0YJDTP8WL6EQZ1AMN2UXFB379I4KCV5RSH"),
+    ).toThrow(INVALID_KEY_MSG);
+  });
+
+  it("rejects key with duplicate characters", () => {
+    expect(() =>
+      createKeyGenerator("AAJDTP8WL6EQZ1AMN2UXFB379I4KCV5RSH"),
+    ).toThrow(INVALID_KEY_MSG);
+  });
+
+  it("rejects non-string input", () => {
+    expect(() => createKeyGenerator(12345)).toThrow(INVALID_KEY_MSG);
+  });
+
+  it("validates on createKeyValidator too", () => {
+    expect(() => createKeyValidator("bad")).toThrow(INVALID_KEY_MSG);
   });
 });

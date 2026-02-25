@@ -41,6 +41,8 @@ Returns a randomly shuffled 34-character string from a safe alphabet (`A-Z` with
 
 ### `createKeyGenerator(secretKey)`
 
+Throws if `secretKey` is not a valid 34-character permutation of the safe alphabet.
+
 Returns a function `(date) => string` that encodes a date into a deterministic base64 SHA256 hash.
 
 ```
@@ -51,6 +53,8 @@ Same date + same secret key always produces the same hash.
 
 ### `createKeyValidator(secretKey)`
 
+Throws if `secretKey` is not a valid 34-character permutation of the safe alphabet.
+
 Returns a function `(hash, currentDate, days) => boolean` that checks whether a key was generated within the last `days` days.
 
 ```javascript
@@ -60,6 +64,10 @@ isKeyValid(key, new Date("2026-02-23"), 28); // true if key was created within l
 ```
 
 ## Changelog
+
+### 1.2.0
+
+- Validate secret key on `createKeyGenerator` / `createKeyValidator` — must be a 34-char permutation of the safe alphabet
 
 ### 1.1.2
 
