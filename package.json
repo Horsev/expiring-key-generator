@@ -11,7 +11,8 @@
   "license": "MIT",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "publish:public": "npm publish --access public"
   },
   "devDependencies": {
     "vitest": "^4.0.18"
