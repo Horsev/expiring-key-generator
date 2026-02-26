@@ -3,6 +3,8 @@ import { generateSecretKey, isValidSecretKey } from "./generateKey.js";
 import {
   createPublicKeyGenerator,
   createKeyValidator as _createKeyValidator,
+  createHourlyKeyGenerator as _createHourlyKeyGenerator,
+  createHourlyKeyValidator as _createHourlyKeyValidator,
 } from "./publicKey.js";
 
 const assertValidKey = (key) => {
@@ -23,4 +25,16 @@ const createKeyGenerator = (secretKey) =>
 const createKeyValidator = (secretKey) =>
   _createKeyValidator(toCodec(secretKey));
 
-export { generateSecretKey, createKeyGenerator, createKeyValidator };
+const createHourlyKeyGenerator = (secretKey) =>
+  _createHourlyKeyGenerator(toCodec(secretKey));
+
+const createHourlyKeyValidator = (secretKey) =>
+  _createHourlyKeyValidator(toCodec(secretKey));
+
+export {
+  generateSecretKey,
+  createKeyGenerator,
+  createKeyValidator,
+  createHourlyKeyGenerator,
+  createHourlyKeyValidator,
+};

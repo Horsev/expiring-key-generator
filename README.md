@@ -19,18 +19,24 @@ import {
   generateSecretKey,
   createKeyGenerator,
   createKeyValidator,
+  createHourlyKeyGenerator,
+  createHourlyKeyValidator,
 } from "expiring-key-generator";
 
 // 1. Generate a secret key (store this securely)
 const secretKey = generateSecretKey();
 
-// 2. Generate a key from a date
+// 2. Daily keys — generate and validate within N days
 const generateKey = createKeyGenerator(secretKey);
 const key = generateKey(new Date()); // => base64 SHA256 string
-
-// 3. Validate a key is within a 28-day window
 const isKeyValid = createKeyValidator(secretKey);
 isKeyValid(key, new Date(), 28); // => true
+
+// 3. Hourly keys — generate and validate within N hours (1–24)
+const generateHourlyKey = createHourlyKeyGenerator(secretKey);
+const hourlyKey = generateHourlyKey(new Date());
+const isHourlyKeyValid = createHourlyKeyValidator(secretKey);
+isHourlyKeyValid(hourlyKey, new Date(), 5); // => true
 ```
 
 ## API
@@ -63,7 +69,33 @@ const isKeyValid = createKeyValidator(secretKey);
 isKeyValid(key, new Date("2026-02-23"), 28); // true if key was created within last 28 days
 ```
 
+### `createHourlyKeyGenerator(secretKey)`
+
+Throws if `secretKey` is not a valid 34-character permutation of the safe alphabet.
+
+Returns a function `(date) => string` that encodes a date (with hour) into a deterministic base64 SHA256 hash. Uses `YYYYMMDDHH` (10 digits) instead of `YYYYMMDD`.
+
+```
+Date → "2026-02-23-14" → "2026022314" → base-N encode → SHA256 base64
+```
+
+### `createHourlyKeyValidator(secretKey)`
+
+Throws if `secretKey` is not a valid 34-character permutation of the safe alphabet.
+
+Returns a function `(hash, currentDate, hours) => boolean` that checks whether a key was generated within the last `hours` hours (1–24 hour windows).
+
+```javascript
+const isHourlyKeyValid = createHourlyKeyValidator(secretKey);
+
+isHourlyKeyValid(key, new Date(), 5); // true if key was created within last 5 hours
+```
+
 ## Changelog
+
+### 1.4.0
+
+- Add `createHourlyKeyGenerator` and `createHourlyKeyValidator` for 1–24 hour windows
 
 ### 1.3.0
 

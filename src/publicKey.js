@@ -31,4 +31,37 @@ const createKeyValidator = (codec) => {
   };
 };
 
-export { createPublicKeyGenerator, createKeyValidator };
+const toLocalDateHour = (date) =>
+  `${toLocalDate(date)}-${pad(date.getHours())}`;
+
+const toHourDigits = (date) => stripDashes(toLocalDateHour(date));
+
+const subtractHours = (date, hours) =>
+  new Date(date.getTime() - hours * 3_600_000);
+
+const generateHourRange = (endDate, hours) =>
+  Array.from({ length: hours + 1 }, (_, i) => subtractHours(endDate, i));
+
+const createHourlyKeyGenerator = (codec) => (date) =>
+  sha256Base64(codec.encode(toHourDigits(date)));
+
+const createHourlyKeyValidator = (codec) => {
+  const generateKey = createHourlyKeyGenerator(codec);
+  let cached = { key: null, hashes: null };
+
+  return (hash, currentDate, hours) => {
+    const cacheKey = `${toLocalDateHour(currentDate)}:${hours}`;
+    if (cached.key !== cacheKey) {
+      const hourRange = generateHourRange(currentDate, hours);
+      cached = { key: cacheKey, hashes: new Set(hourRange.map(generateKey)) };
+    }
+    return cached.hashes.has(hash);
+  };
+};
+
+export {
+  createPublicKeyGenerator,
+  createKeyValidator,
+  createHourlyKeyGenerator,
+  createHourlyKeyValidator,
+};

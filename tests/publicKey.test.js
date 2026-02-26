@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   createKeyGenerator,
   createKeyValidator,
+  createHourlyKeyGenerator,
+  createHourlyKeyValidator,
 } from "../src/index.js";
 
 const SECRET_KEY = "GYJDTP8WL6EQZ1AMN2UXFB379I4KCV5RSH";
@@ -90,6 +92,75 @@ describe("createKeyValidator", () => {
     const key = generateKey(new Date("2026-02-01"));
     expect(isKeyValid(key, new Date("2026-02-23"), 28)).toBe(true);
     expect(isKeyValid(key, new Date("2026-02-23"), 5)).toBe(false);
+  });
+});
+
+describe("createHourlyKeyGenerator", () => {
+  const generateHourlyKey = createHourlyKeyGenerator(SECRET_KEY);
+
+  it("is deterministic — same date+hour produces same hash", () => {
+    const date = new Date("2026-02-23T14:00:00");
+    expect(generateHourlyKey(date)).toBe(generateHourlyKey(date));
+  });
+
+  it("different hours produce different hashes", () => {
+    const a = generateHourlyKey(new Date("2026-02-23T10:00:00"));
+    const b = generateHourlyKey(new Date("2026-02-23T11:00:00"));
+    expect(a).not.toBe(b);
+  });
+
+  it("hourly hash differs from daily hash for same Date", () => {
+    const date = new Date("2026-02-23T14:00:00");
+    const dailyKey = createKeyGenerator(SECRET_KEY)(date);
+    const hourlyKey = generateHourlyKey(date);
+    expect(hourlyKey).not.toBe(dailyKey);
+  });
+
+  it("output is valid base64", () => {
+    const hash = generateHourlyKey(new Date("2026-02-23T14:00:00"));
+    expect(/^[A-Za-z0-9+/]+=*$/.test(hash)).toBe(true);
+  });
+
+  it("output is 44 characters (SHA256 base64)", () => {
+    const hash = generateHourlyKey(new Date("2026-02-23T14:00:00"));
+    expect(hash.length).toBe(44);
+  });
+});
+
+describe("createHourlyKeyValidator", () => {
+  const generateHourlyKey = createHourlyKeyGenerator(SECRET_KEY);
+  const isHourlyKeyValid = createHourlyKeyValidator(SECRET_KEY);
+
+  it("returns true when key is within the hour window", () => {
+    const key = generateHourlyKey(new Date("2026-02-23T10:00:00"));
+    expect(isHourlyKeyValid(key, new Date("2026-02-23T14:00:00"), 5)).toBe(true);
+  });
+
+  it("returns false when key is outside the hour window", () => {
+    const key = generateHourlyKey(new Date("2026-02-23T08:00:00"));
+    expect(isHourlyKeyValid(key, new Date("2026-02-23T14:00:00"), 5)).toBe(false);
+  });
+
+  it("returns true on exact boundary (hour 5)", () => {
+    const key = generateHourlyKey(new Date("2026-02-23T09:00:00"));
+    expect(isHourlyKeyValid(key, new Date("2026-02-23T14:00:00"), 5)).toBe(true);
+  });
+
+  it("returns false one hour past boundary", () => {
+    const key = generateHourlyKey(new Date("2026-02-23T08:00:00"));
+    expect(isHourlyKeyValid(key, new Date("2026-02-23T14:00:00"), 5)).toBe(false);
+  });
+
+  it("returns true for key generated in current hour", () => {
+    const now = new Date("2026-02-23T14:00:00");
+    const key = generateHourlyKey(now);
+    expect(isHourlyKeyValid(key, now, 24)).toBe(true);
+  });
+
+  it("cache invalidates when hour changes", () => {
+    const key = generateHourlyKey(new Date("2026-02-23T10:00:00"));
+    expect(isHourlyKeyValid(key, new Date("2026-02-23T14:00:00"), 5)).toBe(true);
+    expect(isHourlyKeyValid(key, new Date("2026-02-23T16:00:00"), 5)).toBe(false);
   });
 });
 
